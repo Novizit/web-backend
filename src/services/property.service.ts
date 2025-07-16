@@ -1,5 +1,4 @@
 import { prisma } from './prisma.service';
-import { Property, PropertyType, BhkType, Furnishing, PreferredTenant, OwnerType } from '../generated/prisma';
 
 export interface CreatePropertyInput {
   propertyName: string;
@@ -8,11 +7,11 @@ export interface CreatePropertyInput {
   maintenance: number;
   location: string;
   availableFrom: string;
-  propertyType: PropertyType;
-  bhkType: BhkType;
-  furnishing: Furnishing;
-  preferredTenant: PreferredTenant;
-  ownerType: OwnerType;
+  propertyType: 'Individual' | 'Apartment' | 'Villa';
+  bhkType: 'OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK';
+  furnishing: 'Unfurnished' | 'SemiFurnished' | 'FullFurnished';
+  preferredTenant: 'Any' | 'Family' | 'Bachelor';
+  ownerType: 'Landlord' | 'Other';
   ownerName: string;
   contactNumber: string;
   imageUrls?: string[];
@@ -22,14 +21,14 @@ export interface PropertyFilters {
   location?: string;
   minRent?: number;
   maxRent?: number;
-  propertyType?: PropertyType;
-  bhkType?: BhkType[];
-  furnishing?: Furnishing;
-  preferredTenant?: PreferredTenant;
+  propertyType?: 'Individual' | 'Apartment' | 'Villa';
+  bhkType?: ('OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK')[];
+  furnishing?: 'Unfurnished' | 'SemiFurnished' | 'FullFurnished';
+  preferredTenant?: 'Any' | 'Family' | 'Bachelor';
 }
 
 export class PropertyService {
-  async createProperty(data: CreatePropertyInput): Promise<Property> {
+  async createProperty(data: CreatePropertyInput): Promise<any> {
     try {
       const property = await prisma.property.create({
         data: {
@@ -62,7 +61,7 @@ export class PropertyService {
   }
 
   // Helper to convert frontend BHK types to backend enum values
-  convertBhkTypeToEnum(bhkType: string): BhkType | null {
+  convertBhkTypeToEnum(bhkType: string): 'OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK' | null {
     if (!bhkType) return null;
     switch (bhkType.toUpperCase()) {
       case '1RK': return 'OneRK';
@@ -156,7 +155,7 @@ export class PropertyService {
       ]);
 
       // Format BHK and furnishing for all properties
-      const formattedProperties = properties.map((property) => ({
+      const formattedProperties = properties.map((property: any) => ({
         ...property,
         formattedBhkType: this.formatBhkType(property.bhkType),
         formattedFurnishing: this.formatFurnishing(property.furnishing),
@@ -189,7 +188,7 @@ export class PropertyService {
     }
   }
 
-  async updateProperty(id: number, data: Partial<CreatePropertyInput>): Promise<Property> {
+  async updateProperty(id: number, data: Partial<CreatePropertyInput>): Promise<any> {
     try {
       const updateData: any = { ...data };
       if (data.availableFrom) {
@@ -226,9 +225,9 @@ export class PropertyService {
     if (!current) throw new Error('Property not found');
 
     // Build BHK type filter: current, +/-1 neighbor
-    const bhkEnumList: BhkType[] = ['OneRK', 'OneBHK', 'TwoBHK', 'ThreeBHK', 'FourBHK'];
+    const bhkEnumList: ('OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK')[] = ['OneRK', 'OneBHK', 'TwoBHK', 'ThreeBHK', 'FourBHK'];
     const currentIndex = bhkEnumList.indexOf(current.bhkType);
-    const bhkTypes: BhkType[] = [];
+    const bhkTypes: ('OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK')[] = [];
     if (currentIndex !== -1) {
       bhkTypes.push(bhkEnumList[currentIndex]);
       if (bhkEnumList[currentIndex - 1]) bhkTypes.push(bhkEnumList[currentIndex - 1]);
@@ -302,15 +301,15 @@ export class PropertyService {
       return score;
     }
     const sorted = candidates
-      .map((p) => ({ ...p, _score: getScore(p) }))
-      .sort((a, b) => b._score - a._score)
+      .map((p: any) => ({ ...p, _score: getScore(p) }))
+      .sort((a: any, b: any) => b._score - a._score)
       .slice(0, maxResults)
-      .map((property) => ({
+      .map((property: any) => ({
         ...property,
         formattedBhkType: this.formatBhkType(property.bhkType),
         formattedFurnishing: this.formatFurnishing(property.furnishing),
       }));
-    console.log("Final similar property candidates (isFallback:", isFallback, "):", sorted.length, sorted.map(p => ({
+    console.log("Final similar property candidates (isFallback:", isFallback, "):", sorted.length, sorted.map((p: any) => ({
       id: p.id, location: p.location, bhkType: p.bhkType, propertyType: p.propertyType, furnishing: p.furnishing, rent: p.rent
     })));
     return { properties: sorted, isFallback };

@@ -1,7 +1,6 @@
 import { Request, Response, RequestHandler } from 'express';
 import { z } from 'zod';
 import { propertyService, CreatePropertyInput, PropertyFilters } from '../../services/property.service';
-import { PropertyType, BhkType, Furnishing, PreferredTenant, OwnerType } from '../../generated/prisma';
 import { createError, asyncHandler } from '../../middleware/errorHandler';
 
 const PropertySchema = z.object({
@@ -11,11 +10,11 @@ const PropertySchema = z.object({
   maintenance: z.number().min(0, 'Maintenance must be a non-negative number'),
   location: z.string().min(1, 'Location is required'),
   availableFrom: z.string().datetime('Available from must be a valid date'),
-  propertyType: z.nativeEnum(PropertyType),
-  bhkType: z.nativeEnum(BhkType),
-  furnishing: z.nativeEnum(Furnishing),
-  preferredTenant: z.nativeEnum(PreferredTenant),
-  ownerType: z.nativeEnum(OwnerType),
+  propertyType: z.enum(['Individual', 'Apartment', 'Villa']),
+  bhkType: z.enum(['OneRK', 'OneBHK', 'TwoBHK', 'ThreeBHK', 'FourBHK']),
+  furnishing: z.enum(['Unfurnished', 'SemiFurnished', 'FullFurnished']),
+  preferredTenant: z.enum(['Any', 'Family', 'Bachelor']),
+  ownerType: z.enum(['Landlord', 'Other']),
   ownerName: z.string().min(1, 'Owner name is required'),
   contactNumber: z.string().min(1, 'Contact number is required'),
   imageUrls: z.array(z.string()).optional(),
@@ -85,7 +84,7 @@ export const getProperties: RequestHandler = asyncHandler(async (req, res) => {
   }
   
   if (propertyType && typeof propertyType === 'string' && propertyType.trim() !== '') {
-    filters.propertyType = propertyType.trim() as PropertyType;
+    filters.propertyType = propertyType.trim() as 'Individual' | 'Apartment' | 'Villa';
   }
   
   if (bhkType) {
@@ -93,7 +92,7 @@ export const getProperties: RequestHandler = asyncHandler(async (req, res) => {
     const convertedBhkTypes = bhkTypes
       .filter(bhk => bhk && String(bhk).trim() !== '')
       .map(bhk => propertyService.convertBhkTypeToEnum(String(bhk)))
-      .filter(bhk => bhk !== null) as BhkType[];
+      .filter(bhk => bhk !== null) as ('OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK')[];
     
     if (convertedBhkTypes.length > 0) {
       filters.bhkType = convertedBhkTypes;
@@ -101,11 +100,11 @@ export const getProperties: RequestHandler = asyncHandler(async (req, res) => {
   }
   
   if (furnishing && typeof furnishing === 'string' && furnishing.trim() !== '') {
-    filters.furnishing = furnishing.trim() as Furnishing;
+    filters.furnishing = furnishing.trim() as 'Unfurnished' | 'SemiFurnished' | 'FullFurnished';
   }
   
   if (preferredTenant && typeof preferredTenant === 'string' && preferredTenant.trim() !== '') {
-    filters.preferredTenant = preferredTenant.trim() as PreferredTenant;
+    filters.preferredTenant = preferredTenant.trim() as 'Any' | 'Family' | 'Bachelor';
   }
 
   const pageNum = Math.max(1, parseInt(page as string, 10));

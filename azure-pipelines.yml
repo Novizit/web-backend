@@ -51,10 +51,11 @@ stages:
           **/*.log
           **/coverage/**
           **/.env*
-          **/dist/**
           **/test/**
           **/*.test.*
           **/*.spec.*
+          **/src/**
+          **/prisma/**
       displayName: 'Create deployment package'
 
     - task: PublishBuildArtifacts@1

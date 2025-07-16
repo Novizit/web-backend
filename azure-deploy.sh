@@ -98,7 +98,7 @@ npm run build
 
 # Create deployment package
 echo -e "${YELLOW}📦 Creating deployment package...${NC}"
-zip -r deployment.zip . -x "node_modules/*" ".git/*" "*.log" "coverage/*" ".env*" "dist/*"
+zip -r deployment.zip . -x "node_modules/*" ".git/*" "*.log" "coverage/*" ".env*" "src/*" "prisma/*"
 
 # Deploy to Azure
 echo -e "${YELLOW}🚀 Deploying to Azure App Service...${NC}"

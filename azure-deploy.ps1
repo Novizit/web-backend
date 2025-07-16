@@ -107,7 +107,8 @@ Copy-Item -Path "." -Destination $deploymentDir -Recurse -Exclude @(
     "*.log",
     "coverage",
     ".env*",
-    "dist"
+    "src",
+    "prisma"
 )
 
 # Create zip file

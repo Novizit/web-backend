@@ -286,7 +286,7 @@ class PropertyService {
                 .sort((a, b) => b._score - a._score)
                 .slice(0, maxResults)
                 .map((property) => (Object.assign(Object.assign({}, property), { formattedBhkType: this.formatBhkType(property.bhkType), formattedFurnishing: this.formatFurnishing(property.furnishing) })));
-            console.log("Final similar property candidates (isFallback:", isFallback, "):", sorted.length, sorted.map(p => ({
+            console.log("Final similar property candidates (isFallback:", isFallback, "):", sorted.length, sorted.map((p) => ({
                 id: p.id, location: p.location, bhkType: p.bhkType, propertyType: p.propertyType, furnishing: p.furnishing, rent: p.rent
             })));
             return { properties: sorted, isFallback };

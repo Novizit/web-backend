@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSimilarProperties = exports.getPropertyById = exports.getProperties = exports.addProperty = void 0;
 const zod_1 = require("zod");
 const property_service_1 = require("../../services/property.service");
-const prisma_1 = require("../../generated/prisma");
 const errorHandler_1 = require("../../middleware/errorHandler");
 const PropertySchema = zod_1.z.object({
     propertyName: zod_1.z.string().min(1, 'Property name is required'),
@@ -21,11 +20,11 @@ const PropertySchema = zod_1.z.object({
     maintenance: zod_1.z.number().min(0, 'Maintenance must be a non-negative number'),
     location: zod_1.z.string().min(1, 'Location is required'),
     availableFrom: zod_1.z.string().datetime('Available from must be a valid date'),
-    propertyType: zod_1.z.nativeEnum(prisma_1.PropertyType),
-    bhkType: zod_1.z.nativeEnum(prisma_1.BhkType),
-    furnishing: zod_1.z.nativeEnum(prisma_1.Furnishing),
-    preferredTenant: zod_1.z.nativeEnum(prisma_1.PreferredTenant),
-    ownerType: zod_1.z.nativeEnum(prisma_1.OwnerType),
+    propertyType: zod_1.z.enum(['Individual', 'Apartment', 'Villa']),
+    bhkType: zod_1.z.enum(['OneRK', 'OneBHK', 'TwoBHK', 'ThreeBHK', 'FourBHK']),
+    furnishing: zod_1.z.enum(['Unfurnished', 'SemiFurnished', 'FullFurnished']),
+    preferredTenant: zod_1.z.enum(['Any', 'Family', 'Bachelor']),
+    ownerType: zod_1.z.enum(['Landlord', 'Other']),
     ownerName: zod_1.z.string().min(1, 'Owner name is required'),
     contactNumber: zod_1.z.string().min(1, 'Contact number is required'),
     imageUrls: zod_1.z.array(zod_1.z.string()).optional(),
