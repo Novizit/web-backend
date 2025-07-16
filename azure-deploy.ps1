@@ -2,7 +2,7 @@
 # This script deploys the backend to Azure App Service
 
 param(
-    [string]$ResourceGroup = "real-estate-platform-rg",
+    [string]$ResourceGroup = "Data_base",
     [string]$AppServiceName = "real-estate-backend",
     [string]$Location = "East US",
     [string]$Sku = "B1"
@@ -132,28 +132,3 @@ Compress-Archive -Path "$deploymentDir\*" -DestinationPath $zipPath -Force
 # Deploy to Azure
 Write-Host "🚀 Deploying to Azure App Service..." -ForegroundColor Yellow
 az webapp deployment source config-zip `
-    --resource-group $ResourceGroup `
-    --name $AppServiceName `
-    --src $zipPath `
-    --output none
-
-# Clean up
-Remove-Item $tempDir -Recurse -Force
-
-# Get the app URL
-$appUrl = az webapp show --resource-group $ResourceGroup --name $AppServiceName --query defaultHostName --output tsv
-
-Write-Host "✅ Deployment successful!" -ForegroundColor Green
-Write-Host "🌐 Your app is available at: https://$appUrl" -ForegroundColor Green
-Write-Host "🔗 Health check: https://$appUrl/health" -ForegroundColor Green
-Write-Host "📊 API Base URL: https://$appUrl/api" -ForegroundColor Green
-
-# Display next steps
-Write-Host "📋 Next steps:" -ForegroundColor Yellow
-Write-Host "1. Configure environment variables in Azure App Service"
-Write-Host "2. Set up Azure Database for PostgreSQL"
-Write-Host "3. Configure Azure Blob Storage"
-Write-Host "4. Update CORS settings with your frontend URL"
-Write-Host "5. Run database migrations: az webapp ssh --resource-group $ResourceGroup --name $AppServiceName"
-
-Write-Host "🎉 Deployment script completed!" -ForegroundColor Green 

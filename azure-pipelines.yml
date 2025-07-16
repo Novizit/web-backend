@@ -6,7 +6,7 @@ pool:
 
 variables:
   nodeVersion: '18.x'
-  resourceGroupName: 'real-estate-platform-rg'
+  resourceGroupName: 'Data_base'
   appServiceName: 'real-estate-backend'
   location: 'East US'
 

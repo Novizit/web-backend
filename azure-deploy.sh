@@ -12,7 +12,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-RESOURCE_GROUP="real-estate-platform-rg"
+RESOURCE_GROUP="Data_base"
 APP_SERVICE_NAME="real-estate-backend"
 LOCATION="East US"
 SKU="B1"
