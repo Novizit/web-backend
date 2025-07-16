@@ -85,4 +85,18 @@ stages:
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
               appType: 'webAppLinux'
               runtimeStack: 'NODE|18-lts'
-              startUpCommand: 'npm start' 
+              startUpCommand: 'npm start'
+              
+          - script: |
+              az webapp config set \
+                --resource-group $(resourceGroupName) \
+                --name $(appServiceName) \
+                --always-on true
+            displayName: 'Configure Always On'
+            
+          - script: |
+              az webapp config set \
+                --resource-group $(resourceGroupName) \
+                --name $(appServiceName) \
+                --generic-configurations '{"idleTimeoutInMinutes": 0}'
+            displayName: 'Configure Idle Timeout' 

@@ -100,4 +100,11 @@ const server = app.listen(PORT, () => {
   logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`🔗 Health check: http://localhost:${PORT}/health`);
   logger.info(`🌐 API Base URL: http://localhost:${PORT}/api`);
-}); 
+});
+
+// Keep-alive mechanism for Azure App Service
+if (process.env.NODE_ENV === 'production') {
+  setInterval(() => {
+    logger.info('Keep-alive ping to prevent Azure App Service from killing the process');
+  }, 30000); // Log every 30 seconds
+} 

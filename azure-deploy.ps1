@@ -71,6 +71,20 @@ az webapp config set `
     --startup-file "npm start" `
     --output none
 
+# Configure always on to prevent process from being killed
+az webapp config set `
+    --resource-group $ResourceGroup `
+    --name $AppServiceName `
+    --always-on true `
+    --output none
+
+# Set idle timeout to prevent process termination
+az webapp config set `
+    --resource-group $ResourceGroup `
+    --name $AppServiceName `
+    --generic-configurations '{"idleTimeoutInMinutes": 0}' `
+    --output none
+
 # Enable logging
 az webapp log config `
     --resource-group $ResourceGroup `
