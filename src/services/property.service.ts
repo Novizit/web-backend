@@ -60,7 +60,7 @@ export class PropertyService {
     }
   }
 
-  // Helper to convert frontend BHK types to backend enum values
+  // Helper to convert frontend BHK types to backend enum values/check
   convertBhkTypeToEnum(bhkType: string): 'OneRK' | 'OneBHK' | 'TwoBHK' | 'ThreeBHK' | 'FourBHK' | null {
     if (!bhkType) return null;
     switch (bhkType.toUpperCase()) {
