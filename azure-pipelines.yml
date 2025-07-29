@@ -57,8 +57,6 @@ stages:
           **/test/**
           **/*.test.*
           **/*.spec.*
-          **/src/**
-          **/prisma/**
       displayName: 'Create deployment package'
 
     - task: PublishBuildArtifacts@1

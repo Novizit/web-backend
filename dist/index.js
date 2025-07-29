@@ -15,7 +15,7 @@ const logger_1 = __importDefault(require("./config/logger"));
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 // Security middleware
 app.use(security_1.securityHeaders);
 app.use(security_1.rateLimiter);
@@ -87,3 +87,9 @@ const server = app.listen(PORT, () => {
     logger_1.default.info(`🔗 Health check: http://localhost:${PORT}/health`);
     logger_1.default.info(`🌐 API Base URL: http://localhost:${PORT}/api`);
 });
+// Keep-alive mechanism for Azure App Service
+if (process.env.NODE_ENV === 'production') {
+    setInterval(() => {
+        logger_1.default.info('Keep-alive ping to prevent Azure App Service from killing the process');
+    }, 30000); // Log every 30 seconds
+}

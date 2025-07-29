@@ -43,7 +43,7 @@ class PropertyService {
             default: return bhkType;
         }
     }
-    // Helper to convert frontend BHK types to backend enum values
+    // Helper to convert frontend BHK types to backend enum values/check
     convertBhkTypeToEnum(bhkType) {
         if (!bhkType)
             return null;
