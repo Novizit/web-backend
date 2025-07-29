@@ -8,6 +8,6 @@ npm install --omit=dev
 echo "Generating Prisma client..."
 npx prisma generate
 
-# Start the application
+# Start the applications
 echo "Starting application..."
 npm start
