@@ -1,0 +1,4 @@
+{"level":"info","message":"🚀 Server is running on port 3001","service":"real-estate-backend","timestamp":"2025-07-29 23:30:01"}
+{"level":"info","message":"📊 Environment: production","service":"real-estate-backend","timestamp":"2025-07-29 23:30:01"}
+{"level":"info","message":"🔗 Health check: http://localhost:3001/health","service":"real-estate-backend","timestamp":"2025-07-29 23:30:01"}
+{"level":"info","message":"🌐 API Base URL: http://localhost:3001/api","service":"real-estate-backend","timestamp":"2025-07-29 23:30:01"}
