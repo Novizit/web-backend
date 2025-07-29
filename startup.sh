@@ -1,13 +1,8 @@
 #!/bin/bash
 
-# Install dependencies
-echo "Installing Node.js dependencies..."
-npm install --omit=dev
+# Go to app directory (this is where Azure deploys your code)
+cd /home/site/wwwroot
 
-# Generate Prisma client
-echo "Generating Prisma client..."
-npx prisma generate
-
-# Start the applications
-echo "Starting application..."
+# Start the Node.js app
+echo "Starting Node.js app..."
 npm start
