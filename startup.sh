@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Go to app directory (this is where Azure deploys your code)
+# Go to app directory (this is where Azure deploys your code).
 cd /home/site/wwwroot
 
 # Install dependencies
