@@ -23,19 +23,27 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Generate Prisma Client
+      - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Build and test app
+      - name: Build and test
         run: |
           npm run build --if-present
           npm run test --if-present
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: |
+            ./
+            !**/node_modules/**/*
+            !**/.git/**/*
+            !**/.github/**/*
+            !**/tests/**/*
+            !**/coverage/**/*
+            .prisma
+            node_modules/@prisma/client
 
   deploy:
     runs-on: ubuntu-latest
@@ -49,7 +57,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -58,7 +66,6 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E9626FE0385C4BECA52C0F17AA6F7947 }}
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Novizit-backend-app'
