@@ -87,7 +87,7 @@ stages:
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
               appType: 'webAppLinux'
               runtimeStack: 'NODE|18-lts'
-              startUpCommand: 'npm start'
+              startUpCommand: 'chmod +x startup.sh && ./startup.sh'
               
           - script: |
               az webapp config set \
