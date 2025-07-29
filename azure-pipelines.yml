@@ -41,7 +41,7 @@ stages:
         npm run lint
       displayName: 'Run linting'
 
-    - task: ArchiveFiles@2
+        - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
         includeRootFolder: false
@@ -57,7 +57,8 @@ stages:
           **/test/**
           **/*.test.*
           **/*.spec.*
-      displayName: 'Create deployment package'
+          **/src/**
+        displayName: 'Create deployment package'
 
     - task: PublishBuildArtifacts@1
       inputs:
