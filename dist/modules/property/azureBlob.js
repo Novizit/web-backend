@@ -15,13 +15,23 @@ const uuid_1 = require("uuid");
 const AZURE_STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT || '';
 const AZURE_STORAGE_ACCESS_KEY = process.env.AZURE_STORAGE_ACCESS_KEY || '';
 const AZURE_BLOB_CONTAINER = process.env.AZURE_BLOB_CONTAINER || 'property-images';
-if (!AZURE_STORAGE_ACCOUNT || !AZURE_STORAGE_ACCESS_KEY) {
-    throw new Error('Azure Blob Storage credentials are not set in environment variables.');
+// Only initialize Azure Blob Storage if credentials are available
+let sharedKeyCredential = null;
+let blobServiceClient = null;
+if (AZURE_STORAGE_ACCOUNT && AZURE_STORAGE_ACCESS_KEY) {
+    try {
+        sharedKeyCredential = new storage_blob_1.StorageSharedKeyCredential(AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_ACCESS_KEY);
+        blobServiceClient = new storage_blob_1.BlobServiceClient(`https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net`, sharedKeyCredential);
+    }
+    catch (error) {
+        console.warn('Failed to initialize Azure Blob Storage:', error);
+    }
 }
-const sharedKeyCredential = new storage_blob_1.StorageSharedKeyCredential(AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_ACCESS_KEY);
-const blobServiceClient = new storage_blob_1.BlobServiceClient(`https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net`, sharedKeyCredential);
 function generateUploadSasUrl(filename_1) {
     return __awaiter(this, arguments, void 0, function* (filename, contentType = 'image/jpeg') {
+        if (!sharedKeyCredential || !blobServiceClient) {
+            throw new Error('Azure Blob Storage is not configured. Please set AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_ACCESS_KEY environment variables.');
+        }
         const containerClient = blobServiceClient.getContainerClient(AZURE_BLOB_CONTAINER);
         const blobName = `${(0, uuid_1.v4)()}-${filename}`;
         const blobClient = containerClient.getBlockBlobClient(blobName);

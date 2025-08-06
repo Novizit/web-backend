@@ -309,9 +309,7 @@ export class PropertyService {
         formattedBhkType: this.formatBhkType(property.bhkType),
         formattedFurnishing: this.formatFurnishing(property.furnishing),
       }));
-    console.log("Final similar property candidates (isFallback:", isFallback, "):", sorted.length, sorted.map((p: any) => ({
-      id: p.id, location: p.location, bhkType: p.bhkType, propertyType: p.propertyType, furnishing: p.furnishing, rent: p.rent
-    })));
+
     return { properties: sorted, isFallback };
   }
 }

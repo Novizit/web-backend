@@ -17,7 +17,7 @@ const PropertySchema = z.object({
   ownerType: z.enum(['Landlord', 'Other']),
   ownerName: z.string().min(1, 'Owner name is required'),
   contactNumber: z.string().min(1, 'Contact number is required'),
-  imageUrls: z.array(z.string()).optional(),
+  imageUrls: z.array(z.string()).min(2, 'At least 2 property images are required'),
 });
 
 export const addProperty: RequestHandler = asyncHandler(async (req, res) => {
