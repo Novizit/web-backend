@@ -43,17 +43,18 @@ export const addProperty: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 export const getProperties: RequestHandler = asyncHandler(async (req, res) => {
-  const { 
-    location, 
-    minRent, 
-    maxRent, 
-    propertyType, 
-    bhkType, 
-    furnishing, 
-    preferredTenant, 
-    page = '1', 
-    limit = '10' 
-  } = req.query;
+  try {
+    const { 
+      location, 
+      minRent, 
+      maxRent, 
+      propertyType, 
+      bhkType, 
+      furnishing, 
+      preferredTenant, 
+      page = '1', 
+      limit = '10' 
+    } = req.query;
   
   // Prepare filters object
   const filters: PropertyFilters = {};
@@ -112,12 +113,16 @@ export const getProperties: RequestHandler = asyncHandler(async (req, res) => {
 
   const result = await propertyService.getProperties(filters, pageNum, limitNum);
 
-  res.json({
-    total: result.total,
-    page: result.page,
-    limit: result.limit,
-    results: result.properties,
-  });
+    res.json({
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      results: result.properties,
+    });
+  } catch (error) {
+    console.error('Error in getProperties:', error);
+    throw createError('Database connection error', 500);
+  }
 });
 
 export const getPropertyById: RequestHandler = asyncHandler(async (req, res) => {

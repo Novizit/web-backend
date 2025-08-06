@@ -23,49 +23,46 @@ stages:
       displayName: 'Install Node.js'
 
     - script: |
-        npm ci
-      displayName: 'Install dependencies'
+        npm ci --only=production
+      displayName: 'Install production dependencies'
 
     - script: |
         npm run build
       displayName: 'Build application'
 
-    # Tests are commented out because they require a test database
-    # To enable tests, set up a test database in the CI/CD pipeline
-    # or implement database mocking for tests
-    # - script: |
-    #     npm test
-    #   displayName: 'Run tests'
-
     - script: |
         npm run lint
       displayName: 'Run linting'
 
-        - task: ArchiveFiles@2
+    # Create optimized deployment package
+    - task: ArchiveFiles@2
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/backend.zip'
         replaceExistingArchive: true
-        excludeFiles: |
-          **/node_modules/**
-          **/.git/**
-          **/*.log
-          **/coverage/**
-          **/.env*
-          **/test/**
-          **/*.test.*
-          **/*.spec.*
-          **/src/**
-        displayName: 'Create deployment package'
+      displayName: 'Create deployment package'
+
+    # Copy necessary files for deployment
+    - script: |
+        mkdir -p $(Build.ArtifactStagingDirectory)/deploy
+        cp -r dist/* $(Build.ArtifactStagingDirectory)/deploy/
+        cp package.json $(Build.ArtifactStagingDirectory)/deploy/
+        cp startup.sh $(Build.ArtifactStagingDirectory)/deploy/
+        cp -r prisma $(Build.ArtifactStagingDirectory)/deploy/
+        cd $(Build.ArtifactStagingDirectory)/deploy
+        npm ci --only=production
+        cd ..
+        zip -r backend-deploy.zip deploy/
+      displayName: 'Create optimized deployment package'
 
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend-deploy.zip'
+        ArtifactName: 'backend-deploy'
         publishLocation: 'Container'
-      displayName: 'Publish artifacts'
+      displayName: 'Publish optimized artifacts'
 
 - stage: Deploy
   displayName: 'Deploy to Azure'
@@ -84,7 +81,7 @@ stages:
               azureSubscription: 'Your-Azure-Subscription'
               appName: $(appServiceName)
               resourceGroupName: $(resourceGroupName)
-              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              package: '$(Pipeline.Workspace)/backend-deploy/backend-deploy.zip'
               appType: 'webAppLinux'
               runtimeStack: 'NODE|18-lts'
               startUpCommand: 'chmod +x startup.sh && ./startup.sh'
