@@ -90,6 +90,10 @@ export class PropertyService {
     limit: number;
   }> {
     try {
+      // Test database connection first
+      await prisma.$connect();
+      console.log('Database connection successful');
+      
       const where: any = {};
 
       if (filters.location && filters.location.trim().length >= 2) {
@@ -142,6 +146,8 @@ export class PropertyService {
 
       const skip = (page - 1) * limit;
 
+      console.log('Executing database query with filters:', JSON.stringify(where));
+
       const [properties, total] = await Promise.all([
         prisma.property.findMany({
           where,
@@ -153,6 +159,8 @@ export class PropertyService {
         }),
         prisma.property.count({ where }),
       ]);
+
+      console.log(`Found ${properties.length} properties, total: ${total}`);
 
       // Format BHK and furnishing for all properties
       const formattedProperties = properties.map((property: any) => ({
@@ -167,8 +175,25 @@ export class PropertyService {
         page,
         limit,
       };
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Database error in getProperties:', error);
+      
+      // Check if it's a connection error
+      if (error?.code === 'P1001' || error?.code === 'P1002') {
+        throw new Error(`Database connection failed: ${error?.message || 'Unknown connection error'}`);
+      }
+      
+      // Check if it's a query error
+      if (error?.code === 'P2002' || error?.code === 'P2003') {
+        throw new Error(`Database query error: ${error?.message || 'Unknown query error'}`);
+      }
+      
       throw new Error(`Failed to fetch properties: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      // Always disconnect in production to prevent connection pool exhaustion
+      if (process.env.NODE_ENV === 'production') {
+        await prisma.$disconnect();
+      }
     }
   }
 

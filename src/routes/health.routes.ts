@@ -1,82 +1,75 @@
 import { Router } from 'express';
 import { prisma } from '../services/prisma.service';
-import { asyncHandler } from '../middleware/errorHandler';
+import logger from '../config/logger';
 
 const router = Router();
 
 // Basic health check
-router.get('/', asyncHandler(async (req, res) => {
-  const healthCheck = {
-    status: 'OK',
+router.get('/', (req, res) => {
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
-    version: process.env.npm_package_version || '1.0.0',
-    memory: process.memoryUsage(),
-    cpu: process.cpuUsage(),
+    service: 'real-estate-backend',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Database health check
+router.get('/db', async (req, res) => {
+  try {
+    // Test database connection
+    await prisma.$connect();
+    
+    // Test a simple query
+    const propertyCount = await prisma.property.count();
+    
+    res.json({
+      status: 'healthy',
+      database: 'connected',
+      propertyCount,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Database health check failed:', error);
+    res.status(500).json({
+      status: 'unhealthy',
+      database: 'disconnected',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
+});
+
+// Detailed health check
+router.get('/detailed', async (req, res) => {
+  const health = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    checks: {
+      database: 'unknown',
+      environment: process.env.NODE_ENV || 'development',
+      port: process.env.PORT || 8080
+    }
   };
 
-  res.status(200).json(healthCheck);
-}));
-
-// Detailed health check with database connectivity
-router.get('/detailed', asyncHandler(async (req, res) => {
-  const startTime = Date.now();
-  
-  // Check database connectivity
-  let dbStatus = 'unknown';
-  let dbResponseTime = 0;
-  
   try {
-    const dbStartTime = Date.now();
-    await prisma.$queryRaw`SELECT 1`;
-    dbResponseTime = Date.now() - dbStartTime;
-    dbStatus = 'connected';
+    // Test database
+    await prisma.$connect();
+    const propertyCount = await prisma.property.count();
+    health.checks.database = 'connected';
+    health.checks.propertyCount = propertyCount;
   } catch (error) {
-    dbStatus = 'disconnected';
+    health.status = 'unhealthy';
+    health.checks.database = 'disconnected';
+    health.checks.databaseError = error instanceof Error ? error.message : 'Unknown error';
+  } finally {
+    await prisma.$disconnect();
   }
 
-  const totalResponseTime = Date.now() - startTime;
-
-  const detailedHealthCheck = {
-    status: dbStatus === 'connected' ? 'OK' : 'DEGRADED',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
-    version: process.env.npm_package_version || '1.0.0',
-    services: {
-      database: {
-        status: dbStatus,
-        responseTime: dbResponseTime,
-      },
-    },
-    system: {
-      memory: process.memoryUsage(),
-      cpu: process.cpuUsage(),
-      platform: process.platform,
-      nodeVersion: process.version,
-    },
-    responseTime: totalResponseTime,
-  };
-
-  const statusCode = dbStatus === 'connected' ? 200 : 503;
-  res.status(statusCode).json(detailedHealthCheck);
-}));
-
-// Readiness probe for Kubernetes
-router.get('/ready', asyncHandler(async (req, res) => {
-  try {
-    // Check if database is ready
-    await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({ status: 'ready' });
-  } catch (error) {
-    res.status(503).json({ status: 'not ready' });
-  }
-}));
-
-// Liveness probe for Kubernetes
-router.get('/live', (req, res) => {
-  res.status(200).json({ status: 'alive' });
+  const statusCode = health.status === 'healthy' ? 200 : 500;
+  res.status(statusCode).json(health);
 });
 
 export default router; 

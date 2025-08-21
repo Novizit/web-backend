@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 const AZURE_STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT || '';
 const AZURE_STORAGE_ACCESS_KEY = process.env.AZURE_STORAGE_ACCESS_KEY || '';
 const AZURE_BLOB_CONTAINER = process.env.AZURE_BLOB_CONTAINER || 'property-images';
+const AZURE_CDN_URL = process.env.AZURE_CDN_URL || '';
 
 // Only initialize Azure Blob Storage if credentials are available
 let sharedKeyCredential: StorageSharedKeyCredential | null = null;
@@ -48,9 +49,13 @@ export async function generateUploadSasUrl(filename: string, contentType: string
   }, sharedKeyCredential).toString();
 
   const uploadUrl = `${blobClient.url}?${sasToken}`;
-  
+
   // Return the public URL (without SAS token) for display
-  const publicUrl = `https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/${AZURE_BLOB_CONTAINER}/${blobName}`;
+  // Prefer CDN host if configured, otherwise fall back to Blob Storage URL
+  const storageBaseUrl = `https://${AZURE_STORAGE_ACCOUNT}.blob.core.windows.net`;
+  const cdnBaseUrl = AZURE_CDN_URL ? AZURE_CDN_URL.replace(/\/+$/, '') : '';
+  const publicBaseUrl = cdnBaseUrl || storageBaseUrl;
+  const publicUrl = `${publicBaseUrl}/${AZURE_BLOB_CONTAINER}/${blobName}`;
   
   return {
     uploadUrl,
