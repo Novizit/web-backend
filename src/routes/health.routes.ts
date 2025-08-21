@@ -50,7 +50,9 @@ router.get('/detailed', async (req, res) => {
     checks: {
       database: 'unknown',
       environment: process.env.NODE_ENV || 'development',
-      port: process.env.PORT || 8080
+      port: process.env.PORT || 8080,
+      propertyCount: 0,
+      databaseError: ''
     }
   };
 

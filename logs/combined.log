@@ -565,3 +565,10 @@
 {"level":"info","message":"Keep-alive ping to prevent Azure App Service from killing the process","service":"real-estate-backend","timestamp":"2025-08-07 00:32:07"}
 {"level":"info","message":"Keep-alive ping to prevent Azure App Service from killing the process","service":"real-estate-backend","timestamp":"2025-08-07 00:32:37"}
 {"level":"info","message":"Keep-alive ping to prevent Azure App Service from killing the process","service":"real-estate-backend","timestamp":"2025-08-07 00:33:07"}
+{"level":"info","message":"🚀 Server is running on port 8080","service":"real-estate-backend","timestamp":"2025-08-21 23:41:09"}
+{"level":"info","message":"📊 Environment: production","service":"real-estate-backend","timestamp":"2025-08-21 23:41:09"}
+{"level":"info","message":"🔗 Health check: http://localhost:8080/health","service":"real-estate-backend","timestamp":"2025-08-21 23:41:09"}
+{"level":"info","message":"🌐 API Base URL: http://localhost:8080/api","service":"real-estate-backend","timestamp":"2025-08-21 23:41:09"}
+{"level":"info","message":"Keep-alive ping to prevent Azure App Service from killing the process","service":"real-estate-backend","timestamp":"2025-08-21 23:41:39"}
+{"level":"info","message":"Keep-alive ping to prevent Azure App Service from killing the process","service":"real-estate-backend","timestamp":"2025-08-21 23:42:09"}
+{"level":"info","message":"Keep-alive ping to prevent Azure App Service from killing the process","service":"real-estate-backend","timestamp":"2025-08-21 23:42:39"}
